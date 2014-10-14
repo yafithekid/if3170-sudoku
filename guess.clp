@@ -11,6 +11,16 @@
 	(assert (index (+ ?id 1)))
 )
 
+(defrule pass-guessable
+	(phase guess)
+	?f <- (index ?id)
+	(possible (value ?v) (id ?id))
+	(not (possible (value ~?v) (id ?id)))
+=>
+	(retract ?f)
+	(assert (index (+ ?id 1)))
+)
+
 (defrule end-guessable-making
 	?f1 <- (phase guess)
 	?f <- (index 37)
@@ -50,7 +60,7 @@
 
 (defrule select-guess-not-diagonal
 	(phase guessing)
-	(guess ?r ?c&:(not (is-diagonal ?c ?r)) ?g ?v ?id)
+	?f1 <- (guess ?r ?c&:(not (is-diagonal ?c ?r)) ?g ?v ?id)
 	(not (possible (row ?r) (value ?v)))
 	(not (possible (column ?c) (value ?v)))
 	(not (possible (group ?g) (value ?v)))
@@ -61,13 +71,14 @@
 	?f <- (index ?id)
 =>
 	(retract ?f)
+	(retract ?f1)
 	(assert (index (+ ?id 1)))
 	(assert (current-guess ?r ?c ?g ?v ?id))
 )
 
 (defrule select-guess-diagonal
 	(phase guessing)
-	(guess ?r ?c&:(is-diagonal ?c ?r) ?g ?v ?id)
+	?f1 <- (guess ?r ?c&:(is-diagonal ?c ?r) ?g ?v ?id)
 	(not (possible (row ?r) (value ?v)))
 	(not (possible (column ?c) (value ?v)))
 	(not (possible (group ?g) (value ?v)))
@@ -77,16 +88,17 @@
 	(not (current-guess ? ? ? ? ?id))
 	(not (possible (row ?r1) (column ?c1&:(is-same-diagonal ?c ?r ?c1 ?r1)) (value ?v)))
 	(not (current-guess ?r2 ?c2&:(is-same-diagonal ?c ?r ?c2 ?r2) ? ?v ?))
+	?f <- (index ?id)
 =>
 	(retract ?f)
+	(retract ?f1)
 	(assert (index (+ ?id 1)))
 	(assert (current-guess ?r ?c ?g ?v ?id))
 )
 
-(defrule dismiss-guess-row
+(defrule dismiss-guess-row-current-guess
 	(phase guessing)
 	?f <- (guess ?r ?c ?g ?v ?id)
-	(possible (row ?r) (value ?v))
 	(current-guess ?r ? ? ?v ~?id)
 	(index ?id)
 =>
@@ -94,10 +106,9 @@
 	(assert (dismiss-guess ?r ?c ?g ?v ?id))
 )
 
-(defrule dismiss-guess-column
+(defrule dismiss-guess-column-current-guess
 	(phase guessing)
 	?f <- (guess ?r ?c ?g ?v ?id)
-	(possible (column ?c) (value ?v))
 	(current-guess ? ?c ? ?v ~?id)
 	(index ?id)
 =>
@@ -105,10 +116,9 @@
 	(assert (dismiss-guess ?r ?c ?g ?v ?id))
 )
 
-(defrule dismiss-guess-group
+(defrule dismiss-guess-group-current-guess
 	(phase guessing)
 	?f <- (guess ?r ?c ?g ?v ?id)
-	(possible (group ?g) (value ?v))
 	(current-guess ? ? ?g ?v ~?id)
 	(index ?id)
 =>
@@ -116,11 +126,50 @@
 	(assert (dismiss-guess ?r ?c ?g ?v ?id))
 )
 
-(defrule dismiss-guess-diagonal
+(defrule dismiss-guess-diagonal-current-guess
+	(phase guessing)
+	?f <- (guess ?r ?c ?g ?v ?id)
+	(current-guess ?r1 ?c1&:(is-same-diagonal ?c ?r ?c1 ?r1) ?g1 ?v ~?id)
+	(index ?id)
+=>
+	(retract ?f)
+	(assert (dismiss-guess ?r ?c ?g ?v ?id))
+)
+
+(defrule dismiss-guess-column-possible
+	(phase guessing)
+	?f <- (guess ?r ?c ?g ?v ?id)
+	(possible (column ?c) (value ?v))
+	(index ?id)
+=>
+	(retract ?f)
+	(assert (dismiss-guess ?r ?c ?g ?v ?id))
+)
+
+(defrule dismiss-guess-group-possible
+	(phase guessing)
+	?f <- (guess ?r ?c ?g ?v ?id)
+	(possible (group ?g) (value ?v))
+	(index ?id)
+=>
+	(retract ?f)
+	(assert (dismiss-guess ?r ?c ?g ?v ?id))
+)
+
+(defrule dismiss-guess-diagonal-possible
 	(phase guessing)
 	?f <- (guess ?r ?c ?g ?v ?id)
 	(possible (row ?r2)(column ?c2&:(is-same-diagonal ?c ?r ?c2 ?r2)) (value ?v))
-	(current-guess ?r1 ?c1&:(is-same-diagonal ?c ?r ?c1 ?r1) ?g ?v ~?id)
+	(index ?id)
+=>
+	(retract ?f)
+	(assert (dismiss-guess ?r ?c ?g ?v ?id))
+)
+
+(defrule dismiss-guess-row-possible
+	(phase guessing)
+	?f <- (guess ?r ?c ?g ?v ?id)
+	(possible (row ?r) (value ?v))
 	(index ?id)
 =>
 	(retract ?f)
@@ -157,14 +206,14 @@
 
 (defrule finish-rebuild
 	(phase guessing)
-	(rebuild ?id)
+	?f <- (rebuild ?id)
 	(not (dismiss-guess ?r ?c ?g ?v ?id))
 =>
 	(retract ?f)
 	(assert (backtrack (- ?id 1)))
 )
 
-(defrule pass-backtrack-truth
+(defrule pass-backtrack-possible
 	(phase guessing)
 	?f <- (backtrack ?id)
 	(possible (id ?id))

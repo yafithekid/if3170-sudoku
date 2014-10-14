@@ -42,17 +42,16 @@ public class Sudoku {
         // TODO code application logic here
         try {
             Rete env = new Rete();
-            env.eval("(open \"test.txt\" out \"w\")");
             env.clear();
             env.batch("sudoku.clp");
-            env.batch("solve.clp");
             env.batch("output-frills.clp");
             env.batch("guess.clp");
             env.batch("grid3x3-p1.clp");
+	    env.eval("(open \"test.txt\" output \"w\")");
             env.reset();
             //env.eval("(assert (try guess))");
             env.run();
-            env.eval("(close out)");
+            env.eval("(close output)");
         } catch (JessException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
