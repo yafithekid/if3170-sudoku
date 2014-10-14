@@ -437,11 +437,9 @@
    
    (possible (value ?v) (row ?r) (column ?c) (id ?id))
    
-   (not (possible (value ?v) (row ?r1) (column ?c1&:(or (and (= ?c ?r) (= ?r1 ?c1))
-			 (and (= (+ ?c ?r) 7) (= (+ ?c1 ?r1) 7))
-   ))  (id ~?id)))
+   (not (possible (value ?v) (row ?r1) (column ?c1&:(is-same-diagonal ?c ?r ?c1 ?r1)) (id ~?id)))
    
-   (possible (value ?v2&~?v) (row ?r) (column ?c) (id ?id))
+   (possible (value ?v2&~?v)  (id ?id))
    
    (not (impossible (id ?id) (value ?v2) (rank ?p)))
 

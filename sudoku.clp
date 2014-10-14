@@ -327,6 +327,8 @@
    
    ?f <- (phase match)
    
+   (not (try guessing))
+   
    (not (impossible))
    
    (rank (value ?last))
@@ -342,6 +344,27 @@
    (assert (phase final-output))
    (assert (print-position 1 1)))
 
+(defrule begin-guessing
+
+   (declare (salience -20))
+   
+   ?f <- (phase match)
+   
+   (try guessing)
+   
+   (not (impossible))
+   
+   (rank (value ?last))
+   
+   (not (rank (value ?p&:(> ?p ?last))))
+
+   (not (technique (rank ?next&:(> ?next ?last))))
+   
+   =>
+   
+   (retract ?f)
+   
+   (assert (phase guess)))
    
 
   

@@ -16,7 +16,7 @@
 
    =>
    
-   (printout ?*output* crlf ""))
+   (printout ?*output* crlf "The puzzle is: " crlf crlf "   "))
 
 ;;; ***********
 ;;; print-final
@@ -30,7 +30,7 @@
 
    =>
    
-   (printout ?*output* crlf ""))
+   (printout ?*output* crlf "The solution is: " crlf crlf "   "))
 
 ;;; **************************
 ;;; print-position-value-found
@@ -38,7 +38,7 @@
 
 (defrule print-position-value-found
 
-   (phase final-output)
+   (phase initial-output | final-output)
    
    (print-position ?r ?c)
    
@@ -70,7 +70,7 @@
 
    (declare (salience -5))
 
-   (phase final-output)
+   (phase initial-output | final-output)
    
    (print-position ?r ?c)
    
@@ -164,7 +164,7 @@
       
    =>
    
-   (printout ?*output* "")
+   (printout ?*output* crlf crlf "Rules used:" crlf crlf)
    
    (retract ?f1 ?f2 ?f3)
    
@@ -230,7 +230,7 @@
       
    =>
    
-   (printout ?*output* "")
+   (printout ?*output* "   " ?reason crlf)
    
    (retract ?f))
     
@@ -246,6 +246,6 @@
             
    =>
    
-   (printout ?*output* )
+   (printout ?*output* crlf)
    
    (retract ?f))
