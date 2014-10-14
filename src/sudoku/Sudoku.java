@@ -20,6 +20,15 @@ import sudoku.GUISudoku;
 public class Sudoku {
     public static final int ANY = 0;
     public static GUISudoku gui;
+    
+    private static int id[][] = {
+                {1,2,3,7,8,9},
+                {4,5,6,10,11,12},
+                {13,14,15,19,20,21},
+                {16,17,18,22,23,24},
+                {25,26,27,31,32,33},
+                {28,29,30,34,35,36}
+            };
     /**
      * @param args the command line arguments
      */
@@ -51,15 +60,18 @@ public class Sudoku {
         System.out.println("ok");
         FileReader fr;
         try {
-            
+            int r = 0,c = 0;
             fr = new FileReader("test.txt");
             Scanner sc = new Scanner(fr);
-            int i = 0;
+            
             while (sc.hasNextInt()){
                 int next = sc.nextInt();
-                gui.setSudokuValue(i, next);
-                //System.out.println(next);
-                i++;
+                int i = id[r][c];
+                gui.setSudokuValue(i-1, next);
+                c++;
+                if (c >= 6){
+                    c = 0; r++;
+                }
             }
         } catch (Exception e){
         }
@@ -87,14 +99,7 @@ public class Sudoku {
                 {5,5,5,6,6,6},
                 {5,5,5,6,6,6}
             };
-            int id[][] = {
-                {1,2,3,7,8,9},
-                {4,5,6,10,11,12},
-                {13,14,15,19,20,21},
-                {16,17,18,22,23,24},
-                {25,26,27,31,32,33},
-                {28,29,30,34,35,36}
-            };
+            
             int r = 0, c = 0;
             while (sc.hasNextInt()){
                 int nextInt = sc.nextInt();
