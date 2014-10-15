@@ -215,3 +215,37 @@
    (printout ?*output* crlf)
    
    (retract ?f1 ?f2))
+      
+;;; *********
+;;; list-rule
+;;; *********
+
+(defrule list-rule
+
+   (phase list-rules)
+      
+   ?f <- (technique-employed (rank ?p) (reason ?reason))
+   
+   (not (technique-employed (rank ?p2&:(< ?p2 ?p))))
+      
+   =>
+   
+   (printout ?*output* "")
+   
+   (retract ?f))
+    
+;;; **************
+;;; list-rule-done
+;;; **************
+
+(defrule list-rule-done
+
+   (declare (salience -10))
+
+   ?f <- (phase list-rules)
+            
+   =>
+   
+   (printout ?*output* )
+   
+   (retract ?f))

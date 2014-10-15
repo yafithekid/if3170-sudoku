@@ -44,12 +44,13 @@ public class Sudoku {
             Rete env = new Rete();
             env.clear();
             env.batch("sudoku.clp");
+			env.batch("solve.clp");
             env.batch("output-frills.clp");
             env.batch("guess.clp");
             env.batch("grid3x3-p1.clp");
 	    env.eval("(open \"test.txt\" output \"w\")");
             env.reset();
-            //env.eval("(assert (try guess))");
+            env.eval("(assert (try guess))");
             env.run();
             env.eval("(close output)");
         } catch (JessException e) {

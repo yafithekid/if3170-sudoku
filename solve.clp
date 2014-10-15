@@ -435,18 +435,18 @@
 
    (technique (name Hidden-Single) (rank ?p))
    
-   (possible (value ?v) (row ?r) (column ?c) (id ?id))
+   (possible (value ?v) (column ?c) (row ?r&:(is-diagonal ?c ?r)) (id ?id))
    
-   (not (possible (value ?v) (row ?r1) (column ?c1&:(is-same-diagonal ?c ?r ?c1 ?r1)) (id ~?id)))
+   (not (possible (value ?v) (column ?c1) (row ?r1&:(is-same-diagonal ?c ?r ?c1 ?r1)) (id ~?id)))
    
-   (possible (value ?v2&~?v)  (id ?id))
+   (possible (value ?v2&~?v) (column ?c) (row ?r) (id ?id))
    
    (not (impossible (id ?id) (value ?v2) (rank ?p)))
 
    =>
    
    (assert (impossible (id ?id) (value ?v2) (rank ?p) (reason "Hidden Single"))))
-
+   
    
 ;;; ############################
 ;;; Locked Candidate Single Line
